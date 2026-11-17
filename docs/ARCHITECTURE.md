@@ -3,7 +3,7 @@
 - **Lovable:** interface, dashboards e experiência do usuário.
 - **Lovable Cloud:** banco PostgreSQL gerenciado e autenticação do produto.
 - **Windows 11:** processo Python/FastAPI, fonte de preços, três estratégias, Supervisor e paper broker.
-- **Outbox local SQLite:** buffer durável de eventos ainda não enviados. É infraestrutura de entrega, não banco de negócio.
+- **Outbox local SQLite:** buffer durável de eventos ainda não enviados. É infraestrutura de entrega, não banco de negócio. O estado oficial das carteiras é recuperado do Lovable Cloud.
 
 ## Ciclo DEMO
 
