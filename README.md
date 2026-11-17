@@ -8,7 +8,7 @@ Motor independente de paper trading para Bitcoin (BTC/BRL), com três estratégi
 
 - Três carteiras virtuais independentes, cada uma iniciando com R$ 100.
 - Estratégias baseline por médias móveis (conservadora, moderada e agressiva).
-- Supervisor com limites determinísticos de drawdown, perda realizada diária (fuso de Brasília) e exposição.
+- Supervisor com limites determinísticos de drawdown, perda realizada diária (fuso de Brasília), exposição e stop loss de 2% configurável.
 - Cotação pública BTC/BRL via CoinGecko.
 - Fila SQLite local usada exclusivamente como outbox técnica para sincronização; não substitui o banco de negócio no Lovable Cloud.
 - Worker contínuo: executa ciclos de paper trading e sincroniza eventos pendentes com Lovable Cloud.
