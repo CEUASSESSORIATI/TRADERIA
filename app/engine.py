@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from app.config import Settings
-from app.models import StrategyName
+from app.models import StrategyName, Signal, StrategyDecision
 from app.market import CoinGeckoPriceProvider
 from app.paper import PaperBroker
 from app.risk import RiskSupervisor
@@ -39,9 +39,17 @@ class TradingEngine:
         self.outbox.enqueue("market_quote", quote.model_dump(mode="json"))
         for name in StrategyName:
             before = self.broker.snapshot(name, quote.price_brl)
-            decision = self.strategies[name].evaluate(
-                quote.price_brl, has_position=before.btc_quantity > 0
-            )
+            if (before.btc_quantity > 0 and before.avg_entry_brl > 0 and
+                    quote.price_brl <= before.avg_entry_brl * (1 - self.settings.stop_loss_pct / 100)):
+                decision = StrategyDecision(
+                    strategy=name, signal=Signal.SELL, confidence=1.0,
+                    reason=f"Stop loss acionado em {self.settings.stop_loss_pct:.2f}%",
+                    price_brl=quote.price_brl,
+                )
+            else:
+                decision = self.strategies[name].evaluate(
+                    quote.price_brl, has_position=before.btc_quantity > 0
+                )
             verdict = self.supervisor.assess(decision, before)
             if not verdict.allowed and verdict.reason in (
                 "Limite máximo de drawdown atingido", "Limite de perda diária atingido"
