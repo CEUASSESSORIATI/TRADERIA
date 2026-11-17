@@ -1,21 +1,31 @@
+import asyncio
 import hmac
 import logging
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Header, HTTPException
 from app.config import get_settings
 from app.engine import TradingEngine
+from app.worker import run_worker
 
 settings = get_settings()
 logging.basicConfig(level=getattr(logging, settings.log_level.upper(), logging.INFO),
                     format="%(asctime)s %(levelname)s %(name)s %(message)s")
 engine: TradingEngine | None = None
+worker_task: asyncio.Task | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global engine
+    global engine, worker_task
     engine = TradingEngine(settings)
+    worker_task = asyncio.create_task(run_worker(engine, settings))
     yield
+    worker_task.cancel()
+    try:
+        await worker_task
+    except asyncio.CancelledError:
+        pass
+    worker_task = None
     engine = None
 
 
@@ -49,7 +59,7 @@ async def status():
 
 
 @app.post("/engine/tick", dependencies=[Depends(require_token)])
-async def run_tick():
+async def run_tick_manual():
     if engine is None:
         raise HTTPException(status_code=503, detail="Motor não inicializado")
     try:
