@@ -90,6 +90,16 @@ class PaperBroker:
         self.quantity[name] = float(state["btc_quantity"])
         self.avg_entry[name] = float(state["avg_entry_brl"])
         self.realized[name] = float(state["realized_pnl_brl"])
-        self.daily_realized[name] = float(state["daily_realized_pnl_brl"])
+        today = datetime.now(ZoneInfo('America/Sao_Paulo')).date()
+        captured_at = state.get("captured_at")
+        if captured_at:
+            stamp = datetime.fromisoformat(str(captured_at).replace("Z", "+00:00"))
+            snapshot_day = stamp.astimezone(ZoneInfo('America/Sao_Paulo')).date()
+            self.daily_realized[name] = (
+                float(state["daily_realized_pnl_brl"]) if snapshot_day == today else 0.0
+            )
+        else:
+            self.daily_realized[name] = float(state["daily_realized_pnl_brl"])
+        self.current_day = today
         self.peak[name] = float(state["peak_equity_brl"])
         self.halted[name] = bool(state["halted"])
