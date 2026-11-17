@@ -63,3 +63,4 @@ class PortfolioSnapshot(BaseModel):
     peak_equity_brl: float
     drawdown_pct: float
     halted: bool = False
+    captured_at: datetime = Field(default_factory=utc_now)
