@@ -31,6 +31,7 @@ create table if not exists public.cti_strategy_snapshots (
   btc_quantity numeric(28,12) not null,
   equity_brl numeric(24,8) not null,
   realized_pnl_brl numeric(24,8) not null,
+  daily_realized_pnl_brl numeric(24,8) not null,
   unrealized_pnl_brl numeric(24,8) not null,
   return_pct numeric(12,6) not null,
   peak_equity_brl numeric(24,8) not null,
