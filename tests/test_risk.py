@@ -23,3 +23,11 @@ def test_halted_strategy_is_blocked():
                                  confidence=0.8, reason="test", price_brl=300000)
     verdict = RiskSupervisor(Settings()).assess(decision, portfolio(halted=True))
     assert not verdict.allowed
+
+def test_daily_loss_limit_blocks_and_halts_signal():
+    decision = StrategyDecision(strategy=StrategyName.CONSERVATIVE, signal=Signal.BUY,
+                                 confidence=0.8, reason="test", price_brl=300000)
+    p = portfolio(daily_realized_pnl_brl=-3.0)
+    verdict = RiskSupervisor(Settings()).assess(decision, p)
+    assert not verdict.allowed
+    assert verdict.reason == "Limite de perda diária atingido"
