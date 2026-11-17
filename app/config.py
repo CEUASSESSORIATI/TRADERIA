@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     max_daily_loss_pct: float = 3.0
     max_drawdown_pct: float = 8.0
     max_position_pct: float = 25.0
+    stop_loss_pct: float = 2.0
     paper_fee_pct: float = 0.1
     paper_slippage_pct: float = 0.05
     price_provider: str = "coingecko"
