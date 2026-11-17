@@ -31,3 +31,10 @@ def test_daily_loss_limit_blocks_and_halts_signal():
     verdict = RiskSupervisor(Settings()).assess(decision, p)
     assert not verdict.allowed
     assert verdict.reason == "Limite de perda diária atingido"
+
+def test_protective_sell_is_allowed_after_strategy_halt():
+    decision = StrategyDecision(strategy=StrategyName.CONSERVATIVE, signal=Signal.SELL,
+                                 confidence=1.0, reason="stop loss", price_brl=290000)
+    p = portfolio(halted=True, btc_quantity=0.0001, daily_realized_pnl_brl=-10)
+    verdict = RiskSupervisor(Settings()).assess(decision, p)
+    assert verdict.allowed
