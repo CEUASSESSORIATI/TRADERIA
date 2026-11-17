@@ -10,16 +10,20 @@ class RiskVerdict:
 
 
 class RiskSupervisor:
-    """Hard risk controls. Strategy signals can never override these rules."""
+    """Hard risk controls. Protective sells remain allowed even after a halt."""
 
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
 
     def assess(self, decision: StrategyDecision, portfolio: PortfolioSnapshot) -> RiskVerdict:
-        if portfolio.halted:
-            return RiskVerdict(False, "Estratégia suspensa pelo Supervisor")
         if decision.signal == Signal.HOLD:
             return RiskVerdict(False, "Sinal HOLD: nenhuma ordem")
+        if decision.signal == Signal.SELL:
+            if portfolio.btc_quantity <= 0:
+                return RiskVerdict(False, "Não há posição para vender")
+            return RiskVerdict(True, "Venda permitida para reduzir risco")
+        if portfolio.halted:
+            return RiskVerdict(False, "Estratégia suspensa pelo Supervisor")
         if portfolio.drawdown_pct >= self.settings.max_drawdown_pct:
             return RiskVerdict(False, "Limite máximo de drawdown atingido")
         loss_limit = portfolio.initial_capital_brl * self.settings.max_daily_loss_pct / 100
@@ -31,6 +35,4 @@ class RiskSupervisor:
             portfolio.equity_brl * self.settings.max_position_pct / 100
         ):
             return RiskVerdict(False, "Limite de exposição por posição atingido")
-        if decision.signal == Signal.SELL and portfolio.btc_quantity <= 0:
-            return RiskVerdict(False, "Não há posição para vender")
         return RiskVerdict(True, "Aprovado pelas regras de risco")
