@@ -18,7 +18,10 @@ async def run_worker(engine: TradingEngine, settings: Settings) -> None:
             continue
         if not restored:
             try:
-                await sync.flush()
+                while engine.outbox.count() > 0:
+                    delivered = await sync.flush()
+                    if delivered == 0:
+                        raise RuntimeError("Outbox não foi totalmente sincronizada; recuperação pausada")
                 count = await sync.restore_portfolios(engine.broker)
                 log.info("Cloud portfolio recovery complete; restored %s strategies", count)
                 restored = True
