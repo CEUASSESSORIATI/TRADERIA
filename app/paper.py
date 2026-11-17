@@ -1,4 +1,6 @@
 from uuid import uuid4
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from app.config import Settings
 from app.models import PaperTrade, PortfolioSnapshot, StrategyName, Signal
 
@@ -10,11 +12,20 @@ class PaperBroker:
         self.quantity = {name: 0.0 for name in StrategyName}
         self.avg_entry = {name: 0.0 for name in StrategyName}
         self.realized = {name: 0.0 for name in StrategyName}
+        self.daily_realized = {name: 0.0 for name in StrategyName}
+        self.current_day = datetime.now(ZoneInfo('America/Sao_Paulo')).date()
         self.peak = {name: settings.initial_capital_brl for name in StrategyName}
         self.halted = {name: False for name in StrategyName}
         self.trades: list[PaperTrade] = []
 
+    def _roll_day(self) -> None:
+        today = datetime.now(ZoneInfo('America/Sao_Paulo')).date()
+        if today != self.current_day:
+            self.daily_realized = {name: 0.0 for name in StrategyName}
+            self.current_day = today
+
     def snapshot(self, name: StrategyName, price: float) -> PortfolioSnapshot:
+        self._roll_day()
         qty = self.quantity[name]
         equity = self.cash[name] + qty * price
         self.peak[name] = max(self.peak[name], equity)
@@ -24,6 +35,7 @@ class PaperBroker:
             strategy=name, initial_capital_brl=self.settings.initial_capital_brl,
             cash_brl=round(self.cash[name], 8), btc_quantity=qty, equity_brl=round(equity, 8),
             realized_pnl_brl=round(self.realized[name], 8),
+            daily_realized_pnl_brl=round(self.daily_realized[name], 8),
             unrealized_pnl_brl=round(unrealized, 8),
             return_pct=round((equity / self.settings.initial_capital_brl - 1) * 100, 4),
             peak_equity_brl=self.peak[name], drawdown_pct=round(drawdown, 4),
@@ -60,6 +72,8 @@ class PaperBroker:
             pnl = (execution_price - self.avg_entry[name]) * qty - fee
             self.cash[name] += gross - fee
             self.realized[name] += pnl
+            self._roll_day()
+            self.daily_realized[name] += pnl
             self.quantity[name] = 0.0
             self.avg_entry[name] = 0.0
             trade = PaperTrade(id=str(uuid4()), strategy=name, side="sell", symbol="BTCBRL",
