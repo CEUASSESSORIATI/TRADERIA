@@ -56,6 +56,7 @@ class PortfolioSnapshot(BaseModel):
     btc_quantity: float
     equity_brl: float
     realized_pnl_brl: float
+    daily_realized_pnl_brl: float
     unrealized_pnl_brl: float
     return_pct: float
     peak_equity_brl: float
