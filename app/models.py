@@ -54,6 +54,7 @@ class PortfolioSnapshot(BaseModel):
     initial_capital_brl: float
     cash_brl: float
     btc_quantity: float
+    avg_entry_brl: float
     equity_brl: float
     realized_pnl_brl: float
     daily_realized_pnl_brl: float
