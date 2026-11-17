@@ -57,7 +57,7 @@ class PaperBroker:
             qty = (budget - fee) / execution_price
             self.cash[name] -= budget
             old_qty = self.quantity[name]
-            self.avg_entry[name] = ((self.avg_entry[name] * old_qty) + execution_price * qty) / (old_qty + qty)
+            self.avg_entry[name] = ((self.avg_entry[name] * old_qty) + budget) / (old_qty + qty)
             self.quantity[name] += qty
             trade = PaperTrade(id=str(uuid4()), strategy=name, side="buy", symbol="BTCBRL",
                                quantity=qty, price_brl=execution_price, gross_brl=budget,
