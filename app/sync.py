@@ -28,3 +28,13 @@ class OutboxSynchronizer:
             self.outbox.acknowledge(event_id)
             delivered += 1
         return delivered
+
+    async def restore_portfolios(self, broker) -> int:
+        from app.models import StrategyName
+        restored = 0
+        for strategy in StrategyName:
+            state = await self.cloud.fetch_latest_snapshot(strategy.value)
+            if state:
+                broker.restore(state)
+                restored += 1
+        return restored
