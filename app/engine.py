@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from app.config import Settings
 from app.models import StrategyName
@@ -23,8 +24,13 @@ class TradingEngine:
         self.last_price: float | None = None
         self.last_error: str | None = None
         self.cycles = 0
+        self._cycle_lock = asyncio.Lock()
 
     async def tick(self) -> dict:
+        async with self._cycle_lock:
+            return await self._tick_unlocked()
+
+    async def _tick_unlocked(self) -> dict:
         quote = await self.market.get_btc_brl()
         self.last_price = quote.price_brl
         self.last_error = None
