@@ -43,6 +43,10 @@ class TradingEngine:
                 quote.price_brl, has_position=before.btc_quantity > 0
             )
             verdict = self.supervisor.assess(decision, before)
+            if not verdict.allowed and verdict.reason in (
+                "Limite máximo de drawdown atingido", "Limite de perda diária atingido"
+            ):
+                self.broker.halted[name] = True
             trade = None
             if verdict.allowed:
                 trade = self.broker.execute(name, decision.signal, quote.price_brl)
