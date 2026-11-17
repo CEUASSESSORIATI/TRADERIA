@@ -11,7 +11,8 @@ Motor independente de paper trading para Bitcoin (BTC/BRL), com três estratégi
 - Supervisor com limites determinísticos de drawdown, perda realizada diária (fuso de Brasília) e exposição.
 - Cotação pública BTC/BRL via CoinGecko.
 - Fila SQLite local usada exclusivamente como outbox técnica para sincronização; não substitui o banco de negócio no Lovable Cloud.
-- Worker contínuo: executa ciclos de paper trading e tenta sincronizar eventos pendentes com Lovable Cloud.
+- Worker contínuo: executa ciclos de paper trading e sincroniza eventos pendentes com Lovable Cloud.
+- Recuperação do saldo, posição, preço médio e limites a partir do último snapshot na nuvem; o motor permanece pausado se a nuvem não estiver configurada ou não puder recuperar o estado.
 - API FastAPI com token Bearer.
 - Scripts de instalação e operação para Windows 11.
 
@@ -20,6 +21,8 @@ Motor independente de paper trading para Bitcoin (BTC/BRL), com três estratégi
 Windows 11 e Python 3.11 ou 3.12. Não requer Docker nem PostgreSQL local.
 
 ## Instalação
+
+Clone a branch de desenvolvimento: `git clone -b development/ceu-trader-intelligence https://github.com/CEUASSESSORIATI/TRADERIA.git C:\\CEU-TRADER-INTELLIGENCE`.
 
 1. Copie `.env.example` para `.env`.
 2. Defina um `API_ACCESS_TOKEN` forte e exclusivo.
