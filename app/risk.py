@@ -23,7 +23,7 @@ class RiskSupervisor:
         if portfolio.drawdown_pct >= self.settings.max_drawdown_pct:
             return RiskVerdict(False, "Limite máximo de drawdown atingido")
         loss_limit = portfolio.initial_capital_brl * self.settings.max_daily_loss_pct / 100
-        if portfolio.realized_pnl_brl <= -loss_limit:
+        if portfolio.daily_realized_pnl_brl <= -loss_limit:
             return RiskVerdict(False, "Limite de perda diária atingido")
         if decision.signal == Signal.BUY and portfolio.cash_brl <= 0:
             return RiskVerdict(False, "Saldo disponível insuficiente")
