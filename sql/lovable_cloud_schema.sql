@@ -36,7 +36,8 @@ create table if not exists public.cti_strategy_snapshots (
   return_pct numeric(12,6) not null,
   peak_equity_brl numeric(24,8) not null,
   drawdown_pct numeric(12,6) not null,
-  halted boolean not null default false
+  halted boolean not null default false,
+  captured_at timestamptz not null default now()
 );
 
 create table if not exists public.cti_strategy_decisions (
