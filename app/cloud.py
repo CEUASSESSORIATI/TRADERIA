@@ -23,3 +23,24 @@ class CloudSync:
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.post(url, headers=headers, params=params, json=payload)
             response.raise_for_status()
+
+    async def fetch_latest_snapshot(self, strategy: str) -> dict | None:
+        if not self.settings.cloud_configured:
+            raise RuntimeError("Lovable Cloud ainda não configurado")
+        base = self.settings.supabase_url.rstrip("/")
+        url = f"{base}/rest/v1/{self.settings.supabase_table_prefix}strategy_snapshots"
+        headers = {
+            "apikey": self.settings.supabase_service_role_key,
+            "Authorization": f"Bearer {self.settings.supabase_service_role_key}",
+        }
+        params = {
+            "select": "*",
+            "strategy": f"eq.{strategy}",
+            "order": "captured_at.desc",
+            "limit": "1",
+        }
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            rows = response.json()
+            return rows[0] if rows else None
