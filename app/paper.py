@@ -33,7 +33,8 @@ class PaperBroker:
         unrealized = (price - self.avg_entry[name]) * qty
         return PortfolioSnapshot(
             strategy=name, initial_capital_brl=self.settings.initial_capital_brl,
-            cash_brl=round(self.cash[name], 8), btc_quantity=qty, equity_brl=round(equity, 8),
+            cash_brl=round(self.cash[name], 8), btc_quantity=qty,
+            avg_entry_brl=round(self.avg_entry[name], 8), equity_brl=round(equity, 8),
             realized_pnl_brl=round(self.realized[name], 8),
             daily_realized_pnl_brl=round(self.daily_realized[name], 8),
             unrealized_pnl_brl=round(unrealized, 8),
@@ -81,3 +82,14 @@ class PaperBroker:
                                fee_brl=fee, slippage_brl=gross * slip_rate, realized_pnl_brl=pnl)
         self.trades.append(trade)
         return trade
+
+    def restore(self, state: dict) -> None:
+        """Restore authoritative portfolio state from the latest Lovable Cloud snapshot."""
+        name = StrategyName(state["strategy"])
+        self.cash[name] = float(state["cash_brl"])
+        self.quantity[name] = float(state["btc_quantity"])
+        self.avg_entry[name] = float(state["avg_entry_brl"])
+        self.realized[name] = float(state["realized_pnl_brl"])
+        self.daily_realized[name] = float(state["daily_realized_pnl_brl"])
+        self.peak[name] = float(state["peak_equity_brl"])
+        self.halted[name] = bool(state["halted"])
