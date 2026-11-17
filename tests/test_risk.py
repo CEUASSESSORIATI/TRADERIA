@@ -5,7 +5,7 @@ from app.risk import RiskSupervisor
 
 def portfolio(**overrides):
     data = dict(strategy=StrategyName.CONSERVATIVE, initial_capital_brl=100, cash_brl=100,
-                btc_quantity=0, equity_brl=100, realized_pnl_brl=0,
+                btc_quantity=0, equity_brl=100, realized_pnl_brl=0, daily_realized_pnl_brl=0,
                 unrealized_pnl_brl=0, return_pct=0, peak_equity_brl=100,
                 drawdown_pct=0, halted=False)
     data.update(overrides)
