@@ -40,4 +40,4 @@ def test_multiple_buy_average_entry_is_weighted():
     b.cash[n] = 200
     b.execute(n, Signal.BUY, 100)
     b.execute(n, Signal.BUY, 200)
-    assert b.avg_entry[n] == pytest.approx(150)
+    assert b.avg_entry[n] == pytest.approx(133.3333333333)
