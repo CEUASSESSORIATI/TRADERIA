@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - development/**
+      - audit/**
   pull_request:
 
 jobs:
