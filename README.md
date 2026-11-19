@@ -1,5 +1,13 @@
-# CEU Trader Intelligence
+# CEU Trader Intelligence Engine
 
-Projeto independente de paper trading para comparar três estratégias automatizadas de Bitcoin, com supervisão de risco e persistência no Lovable Cloud.
+Bootstrap seguro para paper trading. Não envia ordens reais.
 
-> Estado inicial: estrutura em desenvolvimento. Execução exclusivamente DEMO; nenhuma ordem real é enviada.
+## Execução
+Python 3.11+: `pip install -r requirements.txt`, `uvicorn app.main:app --reload`.
+
+## API
+- GET `/health`
+- GET `/status`
+- POST `/paper/tick` (simulação determinística)
+
+O projeto começa em DEMO. Integrações com corretora e execução real não estão habilitadas.
