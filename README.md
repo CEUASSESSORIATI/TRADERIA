@@ -1,11 +1,12 @@
 # CEU Trader Intelligence Engine
 
-Paper trading engine bootstrap. **Demo-only; no real orders.**
+Demo-only bootstrap; no real orders or brokerage adapter. Includes FastAPI controls, simulated ticks, SQLite persistence and logs.
 
-## Modules
-- API (FastAPI)
-- Risk guardrails and simulator
-- Three independent demo strategies
-- Local desktop control planned as next milestone
+## Local run
+1. `python -m venv .venv`
+2. Activate `.venv` (Windows: `.venv\\Scripts\\activate`)
+3. `pip install -r requirements.txt`
+4. `uvicorn app.main:app --host 127.0.0.1 --port 8000`
+5. Test: `pytest -q`
 
-Run: `python -m venv .venv`, activate, `pip install -r requirements.txt`, `uvicorn app.main:app --host 127.0.0.1 --port 8000`.
+Persistent state and logs are created under `data/`. This demo is not yet a trading strategy or a live trading system.
