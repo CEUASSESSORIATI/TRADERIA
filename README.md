@@ -1,13 +1,11 @@
 # CEU Trader Intelligence Engine
 
-Bootstrap seguro para paper trading. Não envia ordens reais.
+Paper trading engine bootstrap. **Demo-only; no real orders.**
 
-## Execução
-Python 3.11+: `pip install -r requirements.txt`, `uvicorn app.main:app --reload`.
+## Modules
+- API (FastAPI)
+- Risk guardrails and simulator
+- Three independent demo strategies
+- Local desktop control planned as next milestone
 
-## API
-- GET `/health`
-- GET `/status`
-- POST `/paper/tick` (simulação determinística)
-
-O projeto começa em DEMO. Integrações com corretora e execução real não estão habilitadas.
+Run: `python -m venv .venv`, activate, `pip install -r requirements.txt`, `uvicorn app.main:app --host 127.0.0.1 --port 8000`.

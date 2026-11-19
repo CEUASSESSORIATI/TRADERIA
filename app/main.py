@@ -1,20 +1,48 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from .simulator import DemoEngine
 
-app = FastAPI(title="CEU Trader Intelligence Engine", version="0.1.0", description="Paper-trading bootstrap; no live orders.")
+app = FastAPI(title='CEU Trader Intelligence Engine', version='0.2.0', description='DEMO-only simulated trading. No live order adapter.')
+engine = DemoEngine()
 
-class TickRequest(BaseModel):
-    symbol: str = Field(default="BTCUSDT", min_length=3, max_length=20)
+class Tick(BaseModel):
+    symbol: str = Field(default='BTCUSDT', min_length=3, max_length=20)
     price: float = Field(gt=0)
 
-@app.get("/health")
+class Config(BaseModel):
+    enabled: bool = False
+    daily_loss_limit: float = Field(default=10.0, gt=0)
+    trade_size: float = Field(default=10.0, gt=0)
+
+@app.get('/health')
 def health():
-    return {"ok": True, "mode": "DEMO"}
+    return {'ok': True, 'mode': 'DEMO'}
 
-@app.get("/status")
+@app.get('/status')
 def status():
-    return {"engine": "ready", "mode": "DEMO", "live_orders_enabled": False}
+    return engine.status()
 
-@app.post("/paper/tick")
-def paper_tick(req: TickRequest):
-    return {"symbol": req.symbol.upper(), "price": req.price, "mode": "DEMO", "decision": "observe", "live_order": False}
+@app.post('/config')
+def set_config(config: Config):
+    engine.configure(config.model_dump())
+    return engine.status()
+
+@app.post('/control/start')
+def start():
+    engine.start()
+    return engine.status()
+
+@app.post('/control/stop')
+def stop():
+    engine.stop()
+    return engine.status()
+
+@app.post('/paper/tick')
+def tick(req: Tick):
+    if not engine.running:
+        raise HTTPException(409, 'Engine is paused; start DEMO engine first')
+    return engine.tick(req.symbol.upper(), req.price)
+
+@app.get('/paper/ledger')
+def ledger():
+    return engine.ledger
